@@ -1,6 +1,6 @@
 package com.freeolympus.notyourfathersbot.chatbot.bot;
 
-import com.freeolympus.notyourfathersbot.chatbot.handlers.ChatFilterEventHandler;
+import com.freeolympus.notyourfathersbot.chatbot.handlers.SpamFilterEventHandler;
 import com.freeolympus.notyourfathersbot.chatbot.handlers.MessageLoggerEventHandler;
 import com.freeolympus.notyourfathersbot.chatbot.shoutout.chat.MessageShoutoutEventHandler;
 import com.freeolympus.notyourfathersbot.chatbot.shoutout.chat.RaidShoutoutEventHandler;
@@ -13,7 +13,7 @@ public class ChatBotFactory {
 
     private final Supplier<TwitchClient> twitchClientSupplier;
     private final MessageLoggerEventHandler messageLoggerEventHandler;
-    private final ChatFilterEventHandler chatFilterEventHandler;
+    private final SpamFilterEventHandler spamFilterEventHandler;
     private final RaidShoutoutEventHandler raidShoutoutEventHandler;
     private final MessageShoutoutEventHandler messageShoutoutEventHandler;
 
@@ -21,13 +21,13 @@ public class ChatBotFactory {
     public ChatBotFactory(
             Supplier<TwitchClient> twitchClientSupplier,
             MessageLoggerEventHandler messageLoggerEventHandler,
-            ChatFilterEventHandler chatFilterEventHandler,
+            SpamFilterEventHandler spamFilterEventHandler,
             RaidShoutoutEventHandler raidShoutoutEventHandler,
             MessageShoutoutEventHandler messageShoutoutEventHandler
     ) {
         this.twitchClientSupplier = twitchClientSupplier;
         this.messageLoggerEventHandler = messageLoggerEventHandler;
-        this.chatFilterEventHandler = chatFilterEventHandler;
+        this.spamFilterEventHandler = spamFilterEventHandler;
         this.raidShoutoutEventHandler = raidShoutoutEventHandler;
         this.messageShoutoutEventHandler = messageShoutoutEventHandler;
     }
@@ -36,7 +36,7 @@ public class ChatBotFactory {
         var chatBot = new ChatBot(channel, twitchClientSupplier.get());
 
         chatBot.registerEvent(messageLoggerEventHandler);
-        chatBot.registerEvent(chatFilterEventHandler);
+        chatBot.registerEvent(spamFilterEventHandler);
         chatBot.registerEvent(raidShoutoutEventHandler);
         chatBot.registerEvent(messageShoutoutEventHandler);
 
