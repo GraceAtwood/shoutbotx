@@ -65,7 +65,7 @@
   "altaih": {
     "message": "Go give Alt a follow! He’s a mod around here and a cool AF dude.",
     "subjectPronoun": "he",
-    "objecmtPronoun": "him",
+    "objectPronoun": "him",
     "addLastPlaying": true,
     "shoutoutIntervalMins": 60
   },

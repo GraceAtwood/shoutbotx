@@ -5,11 +5,16 @@ import com.amazonaws.services.dynamodbv2.datamodeling.ConversionSchemas;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.freeolympus.notyourfathersbot.chatbot.shoutout.dynamodb.ShoutoutRecordRepository;
-import com.google.inject.*;
+import com.freeolympus.notyourfathersbot.chatbot.Main;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +22,7 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 
 public class ShoutoutConfigModule extends AbstractModule {
+    private static final Logger logger = LogManager.getLogger(ShoutoutConfigModule.class);
 
     private static final String SUBSCRIPTION_TABLE = "notyourfathersbot_shoutout_records";
     private static final String SUBSCRIPTION_TABLE_KEY = "subscription_table";
@@ -27,12 +33,15 @@ public class ShoutoutConfigModule extends AbstractModule {
     private DynamoDBMapperConfig provideDynamoDBMapperConfig(
             @Named(SUBSCRIPTION_TABLE_KEY) String tableName
     ) {
-        return DynamoDBMapperConfig.builder()
+        logger.info("Producing DynamoDBMapperConfig");
+        var mapperConfig = DynamoDBMapperConfig.builder()
                 .withTableNameOverride(DynamoDBMapperConfig.TableNameOverride.withTableNameReplacement(tableName))
                 .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
                 .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES)
                 .withConversionSchema(ConversionSchemas.V2_COMPATIBLE)
                 .build();
+        logger.info("Produced DynamoDBMapperConfig");
+        return mapperConfig;
     }
 
     @Inject
@@ -42,20 +51,28 @@ public class ShoutoutConfigModule extends AbstractModule {
             AmazonDynamoDB amazonDynamoDB,
             DynamoDBMapperConfig mapperConfig
     ) {
-        return new DynamoDBMapper(amazonDynamoDB, mapperConfig);
+        logger.info("Producing dynamodb mapper...");
+        var dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB, mapperConfig);
+        logger.info("Produced dynamodb mapper");
+        return dynamoDBMapper;
     }
 
     @Inject
     @Singleton
     @Provides
     public CustomShoutouts provideCustomShoutouts() {
+
+        logger.info("Begin loading shout outs configuration...");
         try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("shoutouts.json")) {
             var shoutoutJson = IOUtils.toString(Objects.requireNonNull(inputStream), Charset.defaultCharset());
 
-            return new ObjectMapper().readValue(shoutoutJson, CustomShoutouts.class);
+            var customShoutouts = new ObjectMapper().readValue(shoutoutJson, CustomShoutouts.class);
+            logger.info("Finished loading shout outs configuration.");
+            return customShoutouts;
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Throwable t) {
+            logger.error("An error occurred while loading the shouts config!", t);
+            throw new RuntimeException(t);
         }
     }
 

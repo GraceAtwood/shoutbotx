@@ -36,7 +36,7 @@ public class ChatBotFactory {
         var chatBot = new ChatBot(channel, twitchClientSupplier.get());
 
         chatBot.registerEvent(messageLoggerEventHandler);
-        chatBot.registerEvent(spamFilterEventHandler);
+        //chatBot.registerEvent(spamFilterEventHandler);
         chatBot.registerEvent(raidShoutoutEventHandler);
         chatBot.registerEvent(messageShoutoutEventHandler);
 

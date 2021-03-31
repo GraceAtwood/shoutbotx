@@ -31,7 +31,7 @@ public class ChatBot implements Closeable {
         twitchClient.getChat().joinChannel(channel);
 
         logger.info("Joined channel {}", channel);
-        twitchClient.getChat().sendMessage(channel, "I'm alive");
+        twitchClient.getChat().sendMessage(channel, "I've restarted!");
         logger.info("Sent message!");
     }
 
