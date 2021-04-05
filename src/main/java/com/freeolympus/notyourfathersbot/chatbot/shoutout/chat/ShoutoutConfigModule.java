@@ -25,15 +25,14 @@ import static java.lang.String.format;
 public class ShoutoutConfigModule extends AbstractModule {
     private static final Logger logger = LogManager.getLogger(ShoutoutConfigModule.class);
 
-    private static final String SUBSCRIPTION_TABLE = "notyourfathersbot_shoutout_records";
-    private static final String SUBSCRIPTION_TABLE_KEY = "subscription_table";
-
     @Inject
     @Provides
     @Singleton
     private DynamoDBMapperConfig provideDynamoDBMapperConfig(
-            @Named(SUBSCRIPTION_TABLE_KEY) String tableName
+            @Named(CHANNEL) String channelName
     ) {
+        var tableName = format("shoutout_records_%s", channelName);
+
         logger.info("Producing DynamoDBMapperConfig");
         var mapperConfig = DynamoDBMapperConfig.builder()
                 .withTableNameOverride(DynamoDBMapperConfig.TableNameOverride.withTableNameReplacement(tableName))
@@ -82,7 +81,5 @@ public class ShoutoutConfigModule extends AbstractModule {
     @Override
     protected void configure() {
         super.configure();
-
-        bind(String.class).annotatedWith(Names.named(SUBSCRIPTION_TABLE_KEY)).toInstance(SUBSCRIPTION_TABLE);
     }
 }
