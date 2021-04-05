@@ -53,7 +53,7 @@ public class Main {
                 .argName(CHANNEL)
                 .required()
                 .hasArg()
-                .desc("The domain in which we're running.  If unset, tries to guess the region from the ec2 instance metadata.")
+                .desc("The channel to which to connect.")
                 .longOpt(CHANNEL)
                 .build());
 
