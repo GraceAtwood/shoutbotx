@@ -7,6 +7,8 @@ import com.google.inject.name.Names;
 
 public class ConfigModule extends AbstractModule {
 
+    public static final String CHANNEL = "channel";
+
     private static final String BOT_NAME = "notyourfathersbot";
     public static final String BOT_NAME_KEY = "BOT_NAME_KEY";
 

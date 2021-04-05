@@ -5,7 +5,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.ConversionSchemas;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.freeolympus.notyourfathersbot.chatbot.Main;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -16,10 +15,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
+
+import static com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule.CHANNEL;
+import static java.lang.String.format;
 
 public class ShoutoutConfigModule extends AbstractModule {
     private static final Logger logger = LogManager.getLogger(ShoutoutConfigModule.class);
@@ -60,11 +61,13 @@ public class ShoutoutConfigModule extends AbstractModule {
     @Inject
     @Singleton
     @Provides
-    public CustomShoutouts provideCustomShoutouts() {
+    public CustomShoutouts provideCustomShoutouts(
+            @Named(CHANNEL) String channelName
+    ) {
 
         logger.info("Begin loading shout outs configuration...");
-        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("shoutouts.json")) {
-            var shoutoutJson = IOUtils.toString(Objects.requireNonNull(inputStream), Charset.defaultCharset());
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(format("shoutouts/%s.json", channelName.toLowerCase()))) {
+            var shoutoutJson = IOUtils.toString(Objects.requireNonNull(inputStream, format("Failed to load shoutouts for '%s'!  Does the file exist?", channelName)), Charset.defaultCharset());
 
             var customShoutouts = new ObjectMapper().readValue(shoutoutJson, CustomShoutouts.class);
             logger.info("Finished loading shout outs configuration.");
