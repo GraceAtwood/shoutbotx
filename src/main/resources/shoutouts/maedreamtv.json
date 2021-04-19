@@ -4,6 +4,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "owldamone": {
@@ -11,6 +12,7 @@
     "subjectPronoun": "she",
     "objectPronoun": "her",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "itsjorja": {
@@ -18,6 +20,7 @@
     "subjectPronoun": "she",
     "objectPronoun": "her",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "brodiemxnn": {
@@ -25,6 +28,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "coppa": {
@@ -32,6 +36,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "fareoh": {
@@ -39,6 +44,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "susu_jpg": {
@@ -46,6 +52,7 @@
     "subjectPronoun": "she",
     "objectPronoun": "her",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "drewsterj": {
@@ -53,6 +60,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "kegcontrol": {
@@ -60,6 +68,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "altaih": {
@@ -67,6 +76,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "lilchup_": {
@@ -74,6 +84,7 @@
     "subjectPronoun": "she",
     "objectPronoun": "her",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "sojusammy": {
@@ -81,6 +92,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "junk0793": {
@@ -88,6 +100,7 @@
     "subjectPronoun": "he",
     "objectPronoun": "him",
     "addLastPlaying": true,
+    "addTwitch": true,
     "shoutoutIntervalMins": 60
   },
   "tashalej": {
@@ -95,6 +108,15 @@
     "subjectPronoun": "she",
     "objectPronoun": "her",
     "addLastPlaying": true,
+    "addTwitch": true,
+    "shoutoutIntervalMins": 60
+  },
+  "rawrsiexd": {
+    "message": "Rawrs possesses the actual voice of an angel <3 We love her so much <3 Please go check out her incredible talent over on youtube and drop her a sub https://www.youtube.com/channel/UCJpFuXZ-kbkuom53KDSr-UQ",
+    "subjectPronoun": "she",
+    "objectPronoun": "her",
+    "addLastPlaying": false,
+    "addTwitch": false,
     "shoutoutIntervalMins": 60
   }
 }

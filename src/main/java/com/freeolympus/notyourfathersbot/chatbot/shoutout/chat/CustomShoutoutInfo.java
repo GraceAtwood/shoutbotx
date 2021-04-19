@@ -26,6 +26,7 @@ public class CustomShoutoutInfo {
     private String subjectPronoun;
     private String objectPronoun;
     private Boolean addLastPlaying;
+    private Boolean addTwitch;
     private Integer shoutoutIntervalMins;
 
     public String produceShoutoutMessage(ChannelInformation channelInformation) {
@@ -42,6 +43,10 @@ public class CustomShoutoutInfo {
             result = result.concat(format(" %s was last seen streaming %s!", StringUtils.capitalize(subjectPronoun), gameName));
         }
 
-        return result.concat(format(" https://twitch.tv/%s", channelInformation.getBroadcasterName()));
+        if (addTwitch) {
+            result = result.concat(format(" https://twitch.tv/%s", channelInformation.getBroadcasterName()));
+        }
+
+        return result;
     }
 }
