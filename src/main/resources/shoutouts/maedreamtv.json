@@ -118,5 +118,13 @@
     "addLastPlaying": false,
     "addTwitch": false,
     "shoutoutIntervalMins": 60
+  },
+  "gloomy_doll": {
+    "message": "For everyone who doesn't know, gloomy is so fucking sweet and beautiful and adorable.  Please go give her a follow <3 <3",
+    "subjectPronoun": "she",
+    "objectPronoun": "her",
+    "addLastPlaying": true,
+    "addTwitch": true,
+    "shoutoutIntervalMins": 60
   }
 }
