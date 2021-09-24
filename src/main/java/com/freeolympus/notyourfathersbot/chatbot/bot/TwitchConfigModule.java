@@ -1,9 +1,11 @@
 package com.freeolympus.notyourfathersbot.chatbot.bot;
 
-import com.freeolympus.notyourfathersbot.chatbot.Main;
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -14,9 +16,9 @@ import org.apache.commons.lang.NullArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
+import static com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule.CHANNEL;
 import static com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule.CLIENT_ID_KEY;
 
 public class TwitchConfigModule extends AbstractModule {
@@ -28,14 +30,17 @@ public class TwitchConfigModule extends AbstractModule {
     @Provides
     @Singleton
     @Inject
-    public Supplier<TwitchClient> provideTwitchClientProvider(
+    public TwitchClient provideTwitchClient(
             @Named(TWITCH_AUTH_TOKEN_KEY) String authToken,
             @Named(TWITCH_IRC_AUTH_TOKEN_KEY) String ircAuthToken,
             @Named(CLIENT_ID_KEY) String clientId
     ) {
-        return () -> TwitchClientBuilder.builder()
-                .withClientSecret(authToken)
-                .withClientId(clientId)
+
+        var credentialManager = CredentialManagerBuilder.builder().build();
+        credentialManager.registerIdentityProvider(new TwitchIdentityProvider(clientId, authToken, ""));
+
+        return TwitchClientBuilder.builder()
+                .withCredentialManager(credentialManager)
                 .withDefaultAuthToken(new OAuth2Credential("twitch", ircAuthToken))
                 .withChatAccount(new OAuth2Credential("twitch", ircAuthToken))
                 .withEnableChat(true)
@@ -43,6 +48,17 @@ public class TwitchConfigModule extends AbstractModule {
                 .withEnableKraken(true)
                 .withEnablePubSub(true)
                 .build();
+    }
+
+    @Provides
+    @Inject
+    @Singleton
+    public CachingHelixProvider provideCachingHelixProvider(
+            TwitchClient twitchClient,
+            @Named(CHANNEL) String channel,
+            @Named(TWITCH_AUTH_TOKEN_KEY) String authToken
+    ) {
+        return new CachingHelixProvider(twitchClient, authToken);
     }
 
     @Override

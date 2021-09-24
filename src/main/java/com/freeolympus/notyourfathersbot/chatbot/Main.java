@@ -1,6 +1,6 @@
 package com.freeolympus.notyourfathersbot.chatbot;
 
-import com.freeolympus.notyourfathersbot.chatbot.bot.ChatBotFactory;
+import com.freeolympus.notyourfathersbot.chatbot.bot.ChatBot;
 import com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule;
 import com.google.inject.*;
 import com.google.inject.name.Names;
@@ -29,19 +29,14 @@ public class Main {
                 logger.info("Key: {} | Binding: {}", entry.getKey(), entry.getValue());
             }
 
-            logger.info("Injecting ChatBotFactory");
-            var chatBotFactory = injector.getInstance(ChatBotFactory.class);
-            logger.info("Injected ChatBotFactory");
-
-            var channelName = injector.getInstance(Key.get(String.class, Names.named(CHANNEL)));
-
-            logger.info("Constructing chatbot");
-            var chatBot = chatBotFactory.construct(channelName);
-            logger.info("Constructed chatbot");
+            logger.info("Injecting ChatBot");
+            var chatBot = injector.getInstance(ChatBot.class);
+            logger.info("Injected ChatBot");
 
             chatBot.start();
         } catch (Throwable throwable) {
             logger.error("An unhandled error occurred!", throwable);
+            throw throwable;
         }
     }
 
@@ -58,7 +53,6 @@ public class Main {
                 .build());
 
         CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
 
         // TODO: The error we print here isn't fantastic.  A better usage statement would be nice if parsing fails.
@@ -66,24 +60,9 @@ public class Main {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("cv-config", options);
-
             System.exit(1);
         }
 
-        final var finalCmd = cmd;
-
-        AbstractModule commandLineModule = new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(String.class)
-                        .annotatedWith(Names.named(CHANNEL))
-                        .toInstance(finalCmd.getOptionValue(CHANNEL));
-            }
-        };
-
-        return Guice
-                .createInjector(commandLineModule)
-                .createChildInjector(new ConfigModule());
+        return Guice.createInjector(new ConfigModule(cmd.getOptionValue(CHANNEL)));
     }
 }

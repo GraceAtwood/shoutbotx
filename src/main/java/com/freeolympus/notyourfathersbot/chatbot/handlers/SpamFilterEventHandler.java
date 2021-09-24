@@ -103,16 +103,16 @@ public class SpamFilterEventHandler {
         var command = elements[1];
 
         switch (command.toLowerCase()) {
-            case "on" -> {
+            case "on":
                 event.getTwitchChat().sendMessage(event.getChannel().getName(), format("Activating antispam.  %s message(s) exist(s) and will be handled.  '!antispam off' to turn me off.", suspectedSpamMessages.size()));
                 deleteAndTimeoutOrBanSuspectedSpamMessages();
                 isAntiSpamEnabled = true;
-            }
-            case "off" -> {
+                break;
+            case "off":
                 isAntiSpamEnabled = false;
                 event.getTwitchChat().sendMessage(event.getChannel().getName(), "antispam disabled.  Now in passive listening mode.");
-            }
-            case "status" -> {
+                break;
+            case "status":
                 var spammerNames = suspectedSpamMessages.stream().map(spamEvent -> spamEvent.getUser().getName()).collect(Collectors.joining(", "));
                 event.getTwitchChat().sendPrivateMessage(event.getUser().getName(), format("Status: %s | Suspected Spam Messages In Window: %s | Suspected Spammers: %s | Spam Window: %s min(s) | Antispam Activation Threshold: %s",
                         isAntiSpamEnabled ? "on" : "off",
@@ -120,9 +120,12 @@ public class SpamFilterEventHandler {
                         spammerNames,
                         spamWindowMinutes,
                         spamMessageCountThreshold));
-            }
-            case "help" -> sendHelpMessage(event);
-            default -> event.getTwitchChat().sendMessage(event.getChannel().getName(), "Unknown command.  '!antispam help' for options.");
+                break;
+            case "help":
+                sendHelpMessage(event);
+                break;
+            default:
+                event.getTwitchChat().sendMessage(event.getChannel().getName(), "Unknown command.  '!antispam help' for options.");
         }
     }
 
@@ -158,7 +161,7 @@ public class SpamFilterEventHandler {
         var originalSize = suspectedSpamMessages.size();
 
         suspectedSpamMessages = suspectedSpamMessages.stream().filter(event ->
-                Duration.between(event.getFiredAtInstant(), Instant.now()).toMinutes() < (long) SpamFilterEventHandler.spamWindowMinutes)
+                        Duration.between(event.getFiredAtInstant(), Instant.now()).toMinutes() < (long) SpamFilterEventHandler.spamWindowMinutes)
                 .collect(Collectors.toList());
 
         logger.info("Removed {} messages from suspected spam messages because they were older than {} minutes", originalSize - suspectedSpamMessages.size(), (long) SpamFilterEventHandler.spamWindowMinutes);

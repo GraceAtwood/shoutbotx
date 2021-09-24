@@ -104,7 +104,7 @@
     "shoutoutIntervalMins": 60
   },
   "tashalej": {
-    "message": "Go follow Tasha, the amazing spider queen and 6ft tall model! She is kind, gorgeous, and funny AF.",
+    "message": "Go follow Tasha, the amazing spider queen and 6ft tall model! She is kind, gorgeous, and funny AF. %url%",
     "subjectPronoun": "she",
     "objectPronoun": "her",
     "addLastPlaying": true,
