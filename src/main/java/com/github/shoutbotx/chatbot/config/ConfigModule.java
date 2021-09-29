@@ -10,9 +10,6 @@ public class ConfigModule extends AbstractModule {
 
     public static final String CHANNEL = "channel";
 
-    private static final String BOT_NAME = "shoutbotx";
-    public static final String BOT_NAME_KEY = "BOT_NAME_KEY";
-
     private final String channel;
 
     public ConfigModule(String channel) {
@@ -23,8 +20,6 @@ public class ConfigModule extends AbstractModule {
     protected void configure() {
         super.configure();
 
-
-        bind(String.class).annotatedWith(Names.named(BOT_NAME_KEY)).toInstance(BOT_NAME);
         bind(String.class).annotatedWith(Names.named(CHANNEL)).toInstance(channel);
 
         install(new TwitchConfigModule());
