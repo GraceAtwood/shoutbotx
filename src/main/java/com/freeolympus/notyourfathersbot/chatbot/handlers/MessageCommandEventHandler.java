@@ -57,7 +57,7 @@ public class MessageCommandEventHandler {
 
             var command = event.getMessage().substring(1, spaceIndex);
             switch (command) {
-                case "addso":
+                case "xso":
                     doAddSo(event);
                     break;
                 case "delso":
@@ -119,13 +119,7 @@ public class MessageCommandEventHandler {
         }
 
         var user = elements[1].toLowerCase();
-        if (user.startsWith("@")) {
-            if (user.length() == 1) {
-                sendHelp(event);
-                return;
-            }
-            user = user.substring(1);
-        }
+
 
         var message = event.getMessage().substring(StringUtils.ordinalIndexOf(event.getMessage(), " ", 2));
 

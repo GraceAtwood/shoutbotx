@@ -2,6 +2,7 @@ package com.freeolympus.notyourfathersbot.chatbot.utils;
 
 import com.freeolympus.notyourfathersbot.chatbot.bot.CachingHelixProvider;
 import com.freeolympus.notyourfathersbot.chatbot.dynamodb.Shoutout;
+import com.freeolympus.notyourfathersbot.chatbot.exceptions.InvalidUsernameException;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.events.domain.EventUser;
 import org.apache.commons.lang3.StringUtils;
@@ -42,4 +43,16 @@ public class ChatUtils {
 
         return message;
     }
+
+    public static String stripUsername(String input) throws InvalidUsernameException {
+        if (input.startsWith("@")) {
+            if (input.length() == 1) {
+                throw new InvalidUsernameException(input);
+            }
+            return input.substring(1);
+        }
+
+        return input;
+    }
+
 }

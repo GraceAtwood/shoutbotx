@@ -1,6 +1,7 @@
 package com.freeolympus.notyourfathersbot.chatbot.config;
 
 import com.freeolympus.notyourfathersbot.chatbot.bot.TwitchConfigModule;
+import com.freeolympus.notyourfathersbot.chatbot.commands.CommandConfigModule;
 import com.freeolympus.notyourfathersbot.chatbot.dynamodb.DynamoDBConfigModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -31,5 +32,6 @@ public class ConfigModule extends AbstractModule {
         install(new TwitchConfigModule());
         install(new AwsConfigModule());
         install(new DynamoDBConfigModule());
+        install(new CommandConfigModule());
     }
 }

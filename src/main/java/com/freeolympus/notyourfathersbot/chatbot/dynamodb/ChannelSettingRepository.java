@@ -13,23 +13,24 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 
-public class ShoutoutSettingRepository {
+public class ChannelSettingRepository {
     private static final Logger logger = LogManager.getLogger();
 
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDBMapperConfig mapperConfig;
     private final DynamoDBMapper dynamoDBMapper;
     private final String channel;
-    private final LoadingCache<String, ShoutoutSetting> cache;
+    private final LoadingCache<String, ChannelSetting> cache;
 
     private boolean isInitialized;
 
-    public ShoutoutSettingRepository(
+    public ChannelSettingRepository(
             AmazonDynamoDB amazonDynamoDB,
             DynamoDBMapperConfig mapperConfig,
             DynamoDBMapper dynamoDBMapper,
@@ -45,39 +46,40 @@ public class ShoutoutSettingRepository {
                 .build(new CacheLoader<>() {
 
                     @Override
-                    public ShoutoutSetting load(@NotNull String user) throws Exception {
+                    public ChannelSetting load(@NotNull String channel) throws Exception {
                         checkIsInitialized();
 
-                        var queryExpression = new DynamoDBQueryExpression<ShoutoutSetting>()
-                                .withHashKeyValues(ShoutoutSetting.builder().channel(channel).build())
-                                .withRangeKeyCondition("user", new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(user)));
+                        var queryExpression = new DynamoDBQueryExpression<ChannelSetting>()
+                                .withHashKeyValues(ChannelSetting.builder().channel(channel).build());
 
-                        var settings = new ArrayList<>(dynamoDBMapper.query(ShoutoutSetting.class, queryExpression, mapperConfig));
+                        var settings = new ArrayList<>(dynamoDBMapper.query(ChannelSetting.class, queryExpression, mapperConfig));
 
                         if (settings.size() == 0)
-                            return ShoutoutSetting.createDefaultSettings(channel, user);
+                            return ChannelSetting.createDefaultSettings(channel);
 
                         if (settings.size() > 1)
-                            throw new IllegalStateException(format("The shoutout setting query for channel '%s' and user '%s' produced multiple results!", channel, user));
+                            throw new IllegalStateException(format("Found multiple rows for channel %s in settings.  That makes no sense!", channel));
 
                         return settings.get(0);
                     }
                 });
     }
 
-    public ShoutoutSetting getShoutoutSettingForUser(String user) {
+    public ChannelSetting getChannelSetting() {
         try {
-            return cache.get(user);
+            return cache.get(channel);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void saveShoutoutSetting(ShoutoutSetting shoutoutSetting) {
-        checkIsInitialized();
+    public void saveChannelSetting(ChannelSetting channelSetting) {
+        if (!channelSetting.getChannel().equals(channel)) {
+            throw new IllegalStateException(format("Attempted to save a channel setting for channel '%s' but this repository only manages settings for channel %s!", channelSetting.getChannel(), channel));
+        }
 
-        dynamoDBMapper.save(shoutoutSetting, mapperConfig);
-        cache.refresh(shoutoutSetting.getUser());
+        dynamoDBMapper.save(channelSetting);
+        cache.refresh(channel);
     }
 
     public void initialize() {
@@ -99,7 +101,7 @@ public class ShoutoutSettingRepository {
     }
 
     private void createTableIfNotExists() {
-        var createTableRequest = dynamoDBMapper.generateCreateTableRequest(ShoutoutSetting.class, mapperConfig);
+        var createTableRequest = dynamoDBMapper.generateCreateTableRequest(ChannelSetting.class, mapperConfig);
 
         var provisionedThroughput = new ProvisionedThroughput(20L, 20L);
         createTableRequest.setProvisionedThroughput(provisionedThroughput);

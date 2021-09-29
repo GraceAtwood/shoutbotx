@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @DynamoDBTable(tableName = "shoutout_setting")
 @Data
@@ -31,4 +32,8 @@ public class ShoutoutSetting {
     @DynamoDBTypeConverted(converter = InstantToStringTypeConverter.class)
     @DynamoDBAttribute(attributeName = "forceShoutoutAfter")
     private Instant forceShoutoutAfter;
+
+    public static ShoutoutSetting createDefaultSettings(String channel, String user) {
+        return new ShoutoutSetting(channel, user, 60, null, null);
+    }
 }

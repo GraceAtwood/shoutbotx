@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule.CHANNEL;
 import static java.lang.String.format;
@@ -80,6 +81,22 @@ public class ShoutoutRepository {
             return null;
 
         return shoutouts.get(ThreadLocalRandom.current().nextInt(shoutouts.size()) % shoutouts.size());
+    }
+
+    public List<Shoutout> getAllShoutouts() {
+        checkIsInitialized();
+
+        var queryExpression = new DynamoDBQueryExpression<Shoutout>()
+                .withHashKeyValues(Shoutout.builder().channel(channel).build());
+
+        ArrayList<Shoutout> result = new ArrayList<>(dynamoDBMapper.query(Shoutout.class, queryExpression, mapperConfig));
+
+        result
+                .stream()
+                .collect(Collectors.groupingBy(Shoutout::getUser))
+                .forEach(cache::put);
+
+        return result;
     }
 
     public void saveShoutout(String user, String text) {
