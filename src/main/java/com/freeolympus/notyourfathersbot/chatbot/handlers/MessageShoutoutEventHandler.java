@@ -12,6 +12,7 @@ import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ThreadLocalRandom;
@@ -52,7 +53,7 @@ public class MessageShoutoutEventHandler {
         var shoutoutSettings = shoutoutSettingRepository.getShoutoutSettingForUser(user);
 
         if (!isReadyForShoutout(shoutoutSettings)) {
-            logger.info("Determined we aren't ready to send a shoutout for {}", user);
+            logger.info("Determined we aren't ready to send a shoutout for {}.", user);
             return;
         }
 
@@ -72,11 +73,14 @@ public class MessageShoutoutEventHandler {
     public static Boolean isReadyForShoutout(ShoutoutSetting setting) {
 
         if (setting.getForceShoutoutAfter() != null && Instant.now().isAfter(setting.getForceShoutoutAfter())) {
+            logger.info("Force shoutout is set and after now() for {}", setting.getUser());
             return true;
         }
 
-        if (setting.getLastShoutoutTime() == null)
+        if (setting.getLastShoutoutTime() == null) {
+            logger.info("{} has never received a shoutout", setting.getUser());
             return true;
+        }
 
         return Instant.now().isAfter(setting.getLastShoutoutTime().plus(setting.getShoutoutIntervalMins(), ChronoUnit.MINUTES));
     }
