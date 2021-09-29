@@ -10,4 +10,4 @@ FROM openjdk:15-alpine
 
 COPY --from=builder /home/app/target/appassembler/ app
 
-ENTRYPOINT ["app/bin/notyourfathersbot"]
+ENTRYPOINT ["app/bin/shoutbotx"]
