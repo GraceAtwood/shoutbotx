@@ -1,6 +1,5 @@
 package com.freeolympus.notyourfathersbot.chatbot.handlers;
 
-import com.freeolympus.notyourfathersbot.chatbot.bot.CachingHelixProvider;
 import com.freeolympus.notyourfathersbot.chatbot.dynamodb.ShoutoutRepository;
 import com.freeolympus.notyourfathersbot.chatbot.dynamodb.ShoutoutSetting;
 import com.freeolympus.notyourfathersbot.chatbot.dynamodb.ShoutoutSettingRepository;
@@ -9,13 +8,15 @@ import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
 
+import static com.freeolympus.notyourfathersbot.chatbot.bot.TwitchConfigModule.TWITCH_AUTH_TOKEN_KEY;
 import static java.lang.String.format;
 
 public class MessageShoutoutEventHandler {
@@ -23,43 +24,41 @@ public class MessageShoutoutEventHandler {
 
     private final ShoutoutRepository shoutoutRepository;
     private final ShoutoutSettingRepository shoutoutSettingRepository;
-    private final CachingHelixProvider cachingHelixProvider;
+    private final String authToken;
 
     @Inject
     public MessageShoutoutEventHandler(
             ShoutoutRepository shoutoutRepository,
             ShoutoutSettingRepository shoutoutSettingRepository,
-            CachingHelixProvider cachingHelixProvider
+            @Named(TWITCH_AUTH_TOKEN_KEY) String authToken
     ) {
         this.shoutoutRepository = shoutoutRepository;
         this.shoutoutSettingRepository = shoutoutSettingRepository;
-        this.cachingHelixProvider = cachingHelixProvider;
+        this.authToken = authToken;
     }
 
     @EventSubscriber
     public void handle(ChannelMessageEvent event) {
         var user = event.getUser().getName();
-        var shoutout = shoutoutRepository.getRandomShoutout(user);
+        var shoutouts = shoutoutRepository.getShoutoutsForUser(user);
 
-        if (shoutout == null) {
+        if (shoutouts.isEmpty()) {
             // We have no custom shout out info for this person
             return;
         }
 
+        var shoutout = shoutouts.get(ThreadLocalRandom.current().nextInt(shoutouts.size()) % shoutouts.size());
+
         var shoutoutSettings = shoutoutSettingRepository.getShoutoutSettingForUser(user);
 
-        if (shoutoutSettings.isEmpty()) {
-            throw new IllegalStateException(format("Failed to find shoutout settings for a user with shoutouts!! User: %s", user));
-        }
-
-        if (!isReadyForShoutout(shoutoutSettings.get())) {
+        if (!isReadyForShoutout(shoutoutSettings)) {
             logger.info("Determined we aren't ready to send a shoutout for {}", user);
             return;
         }
 
         logger.info("Determined we need to send a periodic shoutout to {}", user);
 
-        var message = ChatUtils.formatShoutoutMessage(cachingHelixProvider, shoutout, event.getUser());
+        var message = ChatUtils.formatShoutoutMessage(event.getServiceMediator().getService(TwitchClient.class, "twitch4j"), authToken, shoutout);
 
         logger.info("Sending shoutout: {}", message);
 
@@ -67,7 +66,7 @@ public class MessageShoutoutEventHandler {
 
         // Now we need to update DynamoDB with this shoutout time
         logger.info("Updating dynamodb shoutout time");
-        reportShoutout(user, shoutoutSettings.get());
+        reportShoutout(shoutoutSettings);
     }
 
     public static Boolean isReadyForShoutout(ShoutoutSetting setting) {
@@ -82,7 +81,7 @@ public class MessageShoutoutEventHandler {
         return Instant.now().isAfter(setting.getLastShoutoutTime().plus(setting.getShoutoutIntervalMins(), ChronoUnit.MINUTES));
     }
 
-    public void reportShoutout(String user, ShoutoutSetting shoutoutSetting) {
+    public void reportShoutout(ShoutoutSetting shoutoutSetting) {
         if (shoutoutSetting.getForceShoutoutAfter() != null && Instant.now().isAfter(shoutoutSetting.getForceShoutoutAfter())) {
             shoutoutSetting.setForceShoutoutAfter(null);
         }

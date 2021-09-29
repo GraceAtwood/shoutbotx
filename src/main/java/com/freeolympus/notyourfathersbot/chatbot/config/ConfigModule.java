@@ -13,7 +13,8 @@ public class ConfigModule extends AbstractModule {
     private static final String BOT_NAME = "notyourfathersbot";
     public static final String BOT_NAME_KEY = "BOT_NAME_KEY";
 
-    private static final String CLIENT_ID = "gp762nuuoqcoxypju8c569th9wz7q5";
+    //private static final String CLIENT_ID = "gp762nuuoqcoxypju8c569th9wz7q5";
+    private static final String CLIENT_ID = "kgnl2g1qh1vbwdpdy3nsgy176d9yf1";
     public static final String CLIENT_ID_KEY = "client_id";
     private final String channel;
 

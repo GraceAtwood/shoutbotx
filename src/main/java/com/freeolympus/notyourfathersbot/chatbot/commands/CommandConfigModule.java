@@ -1,6 +1,6 @@
 package com.freeolympus.notyourfathersbot.chatbot.commands;
 
-import com.freeolympus.notyourfathersbot.chatbot.commands.impl.AddShoutout;
+import com.freeolympus.notyourfathersbot.chatbot.commands.impl.*;
 import com.google.inject.*;
 
 import java.util.List;
@@ -13,12 +13,16 @@ public class CommandConfigModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    public Map<String, Command> provideCommands(
+    public List<Command> provideCommands(
             Injector injector
     ) {
-       return Stream.of(
-                injector.getInstance(AddShoutout.class)
-        ).collect(Collectors.toMap(Command::getCommand, command -> command));
+        return List.of(
+                injector.getInstance(AddShoutout.class),
+                injector.getInstance(DeleteShoutout.class),
+                injector.getInstance(GetInterval.class),
+                injector.getInstance(ListShoutouts.class),
+                injector.getInstance(SetInterval.class),
+                injector.getInstance(TriggerShoutout.class)
+        );
     }
-
 }

@@ -6,37 +6,31 @@ import lombok.Getter;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public abstract class Command {
 
     @Getter
-    private final String command;
+    private final Pattern commandRegex;
 
     @Getter
     private final Set<CommandPermission> permittedPermissions;
 
-    @Getter
-    private final Integer coolOffMinutes;
-
     public Command(String command, Set<CommandPermission> permittedPermissions) {
-        this(command, permittedPermissions, null);
-    }
-
-    public Command(String command) {
-        this(command, Collections.singleton(CommandPermission.EVERYONE), null);
-    }
-
-    public Command(String command, Set<CommandPermission> permittedPermissions, Integer coolOffMinutes) {
-        this.command = command;
+        this.commandRegex = Pattern.compile(Pattern.quote(command));
         this.permittedPermissions = permittedPermissions;
-        this.coolOffMinutes = coolOffMinutes;
     }
 
-    public final void execute(ChannelMessageEvent event, String arguments) {
-        executeInternal(event, arguments);
+    public Command(Pattern pattern, Set<CommandPermission> permissions) {
+        commandRegex = pattern;
+        this.permittedPermissions = permissions;
     }
 
-    protected abstract void executeInternal(ChannelMessageEvent event, String arguments);
+    public final void execute(ChannelMessageEvent event, String commandText, String arguments) {
+        executeInternal(event, commandText, arguments);
+    }
+
+    protected abstract void executeInternal(ChannelMessageEvent event, String commandText, String arguments);
 
     public String getHelpText() {
         return "No help provided for command!";

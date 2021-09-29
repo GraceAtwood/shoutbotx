@@ -74,19 +74,11 @@ public class ShoutoutRepository {
         }
     }
 
-    public Shoutout getRandomShoutout(String user) {
-        var shoutouts = getShoutoutsForUser(user);
-
-        if (shoutouts.isEmpty())
-            return null;
-
-        return shoutouts.get(ThreadLocalRandom.current().nextInt(shoutouts.size()) % shoutouts.size());
-    }
-
     public List<Shoutout> getAllShoutouts() {
         checkIsInitialized();
 
         var queryExpression = new DynamoDBQueryExpression<Shoutout>()
+                .withConsistentRead(false)
                 .withHashKeyValues(Shoutout.builder().channel(channel).build());
 
         ArrayList<Shoutout> result = new ArrayList<>(dynamoDBMapper.query(Shoutout.class, queryExpression, mapperConfig));

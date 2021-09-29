@@ -22,7 +22,7 @@ import static com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule.CHAN
 import static com.freeolympus.notyourfathersbot.chatbot.config.ConfigModule.CLIENT_ID_KEY;
 
 public class TwitchConfigModule extends AbstractModule {
-    private static final Logger logger = LogManager.getLogger(TwitchConfigModule.class);
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String TWITCH_AUTH_TOKEN_KEY = "TWITCH_AUTH_TOKEN";
     public static final String TWITCH_IRC_AUTH_TOKEN_KEY = "TWITCH_IRC_AUTH_TOKEN";
@@ -48,17 +48,6 @@ public class TwitchConfigModule extends AbstractModule {
                 .withEnableKraken(true)
                 .withEnablePubSub(true)
                 .build();
-    }
-
-    @Provides
-    @Inject
-    @Singleton
-    public CachingHelixProvider provideCachingHelixProvider(
-            TwitchClient twitchClient,
-            @Named(CHANNEL) String channel,
-            @Named(TWITCH_AUTH_TOKEN_KEY) String authToken
-    ) {
-        return new CachingHelixProvider(twitchClient, authToken);
     }
 
     @Override
