@@ -86,7 +86,7 @@ public class MessageShoutoutEventHandler {
 
     public void reportShoutout(ShoutoutSetting shoutoutSetting) {
         if (shoutoutSetting.getForceShoutoutAfter() != null && Instant.now().isAfter(shoutoutSetting.getForceShoutoutAfter())) {
-            shoutoutSetting.setForceShoutoutAfter(null);
+            shoutoutSetting.setForceShoutoutAfter(Instant.now().plus(10, ChronoUnit.CENTURIES));
         }
 
         shoutoutSetting.setLastShoutoutTime(Instant.now());
