@@ -1,4 +1,4 @@
-package com.github.shoutbotx.chatbot.bot;
+package com.github.shoutbotx.chatbot.config;
 
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;

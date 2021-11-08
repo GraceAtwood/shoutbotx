@@ -16,9 +16,8 @@ public class CommandConfigModule extends AbstractModule {
         return List.of(
                 injector.getInstance(AddShoutout.class),
                 injector.getInstance(DeleteShoutout.class),
-                injector.getInstance(GetInterval.class),
+                injector.getInstance(EditShoutoutSetting.class),
                 injector.getInstance(ListShoutouts.class),
-                injector.getInstance(SetInterval.class),
                 injector.getInstance(TriggerShoutout.class)
         );
     }

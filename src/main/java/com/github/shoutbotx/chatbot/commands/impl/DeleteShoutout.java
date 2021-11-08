@@ -1,10 +1,9 @@
 package com.github.shoutbotx.chatbot.commands.impl;
 
 import com.github.shoutbotx.chatbot.commands.Command;
-import com.github.shoutbotx.chatbot.dynamodb.Shoutout;
-import com.github.shoutbotx.chatbot.dynamodb.ShoutoutRepository;
 import com.github.shoutbotx.chatbot.exceptions.InvalidUsernameException;
-import com.github.shoutbotx.chatbot.utils.ChatUtils;
+import com.github.shoutbotx.chatbot.repositories.ShoutoutRepository;
+import com.github.shoutbotx.chatbot.utils.Utils;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.google.common.primitives.Ints;
@@ -13,22 +12,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DeleteShoutout extends Command {
     private static final Logger logger = LogManager.getLogger();
-
-    private ShoutoutRepository shoutoutRepository;
+    private final ShoutoutRepository shoutoutRepository;
 
     @Inject
     public DeleteShoutout(
             ShoutoutRepository shoutoutRepository
     ) {
         super("del", Set.of(CommandPermission.BROADCASTER, CommandPermission.MODERATOR));
-
         this.shoutoutRepository = shoutoutRepository;
     }
 
@@ -43,16 +38,16 @@ public class DeleteShoutout extends Command {
         var user = StringUtils.substringBefore(arguments, " ");
 
         try {
-            user = ChatUtils.stripUsername(user).toLowerCase();
+            user = Utils.stripUsername(user).toLowerCase();
         } catch (InvalidUsernameException e) {
-            ChatUtils.sendMessage(event, e.getMessage());
+            Utils.sendMessage(event, e.getMessage());
             return;
         }
 
         var shoutouts = shoutoutRepository.getShoutoutsForUser(user);
 
         if (shoutouts.isEmpty()) {
-            ChatUtils.sendMessage(event, "No shoutouts exist for %s", user);
+            Utils.sendMessage(event, "No shoutouts exist for %s", user);
             return;
         }
 
@@ -60,7 +55,7 @@ public class DeleteShoutout extends Command {
         // If no index was provided, delete all shoutouts for user
         if ("".equals(indexArg)) {
             shoutouts.forEach(shoutoutRepository::deleteShoutout);
-            ChatUtils.sendMessage(event, "Deleted %s shoutout(s) for %s", shoutouts.size(), user);
+            Utils.sendMessage(event, "Deleted %s shoutout(s) for %s", shoutouts.size(), user);
             return;
         }
 
@@ -70,17 +65,17 @@ public class DeleteShoutout extends Command {
                 .map(Ints::tryParse);
 
         if (index.isEmpty()) {
-            ChatUtils.sendMessage(event, "Index must be a number!");
+            Utils.sendMessage(event, "Index must be a number!");
             return;
         }
 
         if (index.get() < 1 || index.get() > shoutouts.size()) {
-            ChatUtils.sendMessage(event, "Index is out of range! There are %s shoutouts for %s.", shoutouts.size(), user);
+            Utils.sendMessage(event, "Index is out of range! There are %s shoutouts for %s.", shoutouts.size(), user);
             return;
         }
 
-        var shoutoutToDelete = shoutouts.stream().sorted(Comparator.comparing(Shoutout::getTimeAdded)).collect(Collectors.toList()).get(index.get() - 1);
+        var shoutoutToDelete = shoutouts.get(index.get() - 1);
         shoutoutRepository.deleteShoutout(shoutoutToDelete);
-        ChatUtils.sendMessage(event, "Deleted 1 shoutout for %s", user);
+        Utils.sendMessage(event, "Deleted 1 shoutout for %s", user);
     }
 }

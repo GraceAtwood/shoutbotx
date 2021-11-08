@@ -1,4 +1,4 @@
-package com.github.shoutbotx.chatbot.bot;
+package com.github.shoutbotx.chatbot;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.shoutbotx.chatbot.config.ConfigModule;
@@ -21,7 +21,6 @@ public class ChatBot implements Closeable {
     @Inject
     public ChatBot(
             MessageLoggerEventHandler messageLoggerEventHandler,
-            SpamFilterEventHandler spamFilterEventHandler,
             RaidShoutoutEventHandler raidShoutoutEventHandler,
             MessageShoutoutEventHandler messageShoutoutEventHandler,
             MessageCommandEventHandler messageCommandEventHandler,
@@ -33,7 +32,6 @@ public class ChatBot implements Closeable {
 
         registerEvent(messageLoggerEventHandler);
         registerEvent(messageCommandEventHandler);
-        // registerEvent(spamFilterEventHandler);
         registerEvent(raidShoutoutEventHandler);
         registerEvent(messageShoutoutEventHandler);
     }

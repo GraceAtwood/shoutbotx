@@ -1,22 +1,29 @@
 package com.github.shoutbotx.chatbot.utils;
 
-import com.github.shoutbotx.chatbot.dynamodb.Shoutout;
+import com.github.shoutbotx.chatbot.entities.ShoutoutEntity;
 import com.github.shoutbotx.chatbot.exceptions.InvalidUsernameException;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.google.common.collect.DiscreteDomain;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.distribution.TDistribution;
+import org.apache.commons.math3.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class ChatUtils {
+public class Utils {
     private static final Logger logger = LogManager.getLogger();
 
-    private ChatUtils() {
+    private Utils() {
     }
 
     public static void respondToMessage(ChannelMessageEvent event, String message, Object... formatParams) {
@@ -27,7 +34,7 @@ public class ChatUtils {
         event.getTwitchChat().sendMessage(event.getChannel().getName(), formatParams.length == 0 ? message : format(message, formatParams));
     }
 
-    public static String formatShoutoutMessage(TwitchClient twitchClient, String authToken, Shoutout shoutout) {
+    public static String formatShoutoutMessage(TwitchClient twitchClient, String authToken, ShoutoutEntity shoutout) {
 
         var message = shoutout.getMessage();
 
@@ -69,6 +76,15 @@ public class ChatUtils {
         }
 
         return input;
+    }
+
+    public static ShoutoutEntity selectRandomWithWeight(List<ShoutoutEntity> list) {
+        var distribution = new EnumeratedDistribution<>(
+                list.stream()
+                        .map(shoutout -> Pair.create(shoutout, shoutout.getWeight()))
+                        .collect(Collectors.toList()));
+
+        return distribution.sample();
     }
 
 }

